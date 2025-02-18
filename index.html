@@ -201,25 +201,25 @@
             let backgroundImage = '';
             // Set background image based on weather code and time of day
             if (weatherCode == 0 || weatherCode == 1) { // Clear
-                backgroundImage = timeOfDay === "night" ? "url('night_clear.jpg')" : "url('day_clear.jpg')";
+                backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_clear.jpg')" : "url('Working Weather/day_clear.jpg')";
             
             } else if (weatherCode == 2) { // Partly Cloudy
-                backgroundImage = timeOfDay === "night" ? "url('night_partly_cloudy.jpg')" : "url('day_partly_cloudy.jpg')";
+                backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_partly_cloudy.jpg')" : "url('Working Weather/day_partly_cloudy.jpg')";
 
             } else if (weatherCode == 45 || weatherCode == 48) { // Fog
-                backgroundImage = timeOfDay === "night" ? "url('night_fog.jpg')" : "url('day_fog.jpg')";
+                backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_fog.jpg')" : "url('Working Weather/day_fog.jpg')";
             
             } else if (weatherCode == 3) { // Cloudy
-                backgroundImage = timeOfDay === "night" ? "url('night_cloudy.jpg')" : "url('day_cloudy.jpg')";
+                backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_cloudy.jpg')" : "url('Working Weather/day_cloudy.jpg')";
             
             } else if (weatherCode == 51 || weatherCode == 53 || weatherCode == 55 || weatherCode == 56 || weatherCode == 57 || weatherCode == 61 || weatherCode == 63 || weatherCode == 65 || weatherCode == 66 || weatherCode == 67 || weatherCode == 80 || weatherCode == 81 || weatherCode == 82) { // Rain
-                backgroundImage = timeOfDay === "night" ? "url('night_rainy.gif')" : "url('day_rainy.gif')";
+                backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_rainy.gif')" : "url('Working Weather/day_rainy.gif')";
             
             } else if (weatherCode == 95 || weatherCode == 96 || weatherCode == 99) { // thunderstorms
-                backgroundImage = timeOfDay === "night" ? "url('night_thunderstorms.gif')" : "url('day_thunderstorms.gif')";
+                backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_thunderstorms.gif')" : "url('Working Weather/day_thunderstorms.gif')";
             
             } else if (weatherCode == 71 || weatherCode == 73 || weatherCode == 75 || weatherCode == 77 || weatherCode == 85 || weatherCode == 86) { // Snow
-                backgroundImage = timeOfDay === "night" ? "url('night_snow.gif')" : "url('day_snow.gif')";
+                backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_snow.gif')" : "url('Working Weather/day_snow.gif')";
             
             }
 
