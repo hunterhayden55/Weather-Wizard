@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fb;
+            margin: 0;
+            padding: 0;
+            transition: background-image 1s ease;
+            background-size: cover; /* Ensure background covers the entire area */
+            background-repeat: no-repeat; /* Prevent background from repeating */
+            background-position: center; /* Center the background image */
+            height: 100vh; /* Ensure the body takes the full height of the viewport */
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #00c3ff;
+            margin-bottom: 20px;
+            background-color: #c8f2ff;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        input {
+            width: 30%;
+            margin-right: 10px;
+        }
+        button {
+            background-color: #3b8bdb;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2978b5;
+        }
+        .weather-info {
+            margin-top: 30px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 1.5em;
+            color: #deee00;
+            text-shadow: 1px 1px 2px #000;
+        }
+        .weather-info p {
+            font-size: 1.2em;
+        }
+        .loading {
+            display: none;
+            font-size: 1.5em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Weather Wizard</h1>
+        <input type="text" id="latitude" placeholder="Enter Latitude" />
+        <input type="text" id="longitude" placeholder="Enter Longitude" />
+        <button onclick="getWeather()">Get Weather</button>
+        <button onclick="getLocation()">Use My Location</button>
+
+        <div id="loading" class="loading">Loading...</div>
+
+        <div id="weather-result" class="weather-info" style="display: none;">
+            <p id="temperature"></p>
+            <p id="dewpoint"></p>
+            <p id="pressure"></p>
+            <p id="windspeed"></p>
+            <p id="weathercode"></p> <!-- New paragraph for weather code -->
+        </div>
+    </div>
+
+    <script>
+        // Function to get weather based on user input
+        async function getWeather() {
+            let lat = document.getElementById("latitude").value;
+            let lon = document.getElementById("longitude").value;
+
+            if (!lat || !lon) {
+                alert("Please enter both latitude and longitude.");
+                return;
+            }
+
+            document.getElementById("loading").style.display = "block";
+
+            let url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,dewpoint_2m,pressure_msl,wind_speed_10m,weathercode&hourly=temperature_2m,weathercode`;
+
+            try {
+                let response = await fetch(url);
+                let data = await response.json();
+                let weather = data.current;
+
+                // Set the background based on weather and time of day
+                setBackground(lat, lon, weather);
+
+                // Hide loading
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("weather-result").style.display = "block";
+
+                document.getElementById("temperature").innerText = `Temperature: ${weather.temperature_2m}°C`;
+                document.getElementById("dewpoint").innerText = `Dewpoint: ${weather.dewpoint_2m}°C`;
+                document.getElementById("pressure").innerText = `Pressure: ${weather.pressure_msl} hPa`;
+                document.getElementById("windspeed").innerText = `Wind Speed: ${weather.wind_speed_10m} m/s`;
+                
+                if (weather.weathercode == 0) {
+                    document.getElementById("weathercode").innerText = 'Clear sky';
+                } else if (weather.weathercode == 1) {
+                    document.getElementById("weathercode").innerText = 'Mainly clear';
+                } else if (weather.weathercode == 2) {
+                    document.getElementById("weathercode").innerText = 'Partly cloudy';
+                } else if (weather.weathercode == 3) {
+                    document.getElementById("weathercode").innerText = 'Overcast';
+                } else if (weather.weathercode == 45) {
+                    document.getElementById("weathercode").innerText = 'Fog';
+                } else if (weather.weathercode == 48) {
+                    document.getElementById("weathercode").innerText = 'Depositing rime fog';
+                } else if (weather.weathercode == 51) {
+                    document.getElementById("weathercode").innerText = 'Drizzle: Light';
+                } else if (weather.weathercode == 53) {
+                    document.getElementById("weathercode").innerText = 'Drizzle: Moderate';
+                } else if (weather.weathercode == 55) {
+                    document.getElementById("weathercode").innerText = 'Drizzle: Dense';
+                } else if (weather.weathercode == 61) {
+                    document.getElementById("weathercode").innerText = 'Rain: Slight';
+                } else if (weather.weathercode == 63) {
+                    document.getElementById("weathercode").innerText = 'Rain: Moderate';
+                } else if (weather.weathercode == 65) {
+                    document.getElementById("weathercode").innerText = 'Rain: Heavy';
+                } else if (weather.weathercode == 71) {
+                    document.getElementById("weathercode").innerText = 'Snow fall: Slight';
+                } else if (weather.weathercode == 73) {
+                    document.getElementById("weathercode").innerText = 'Snow fall: Moderate';
+                } else if (weather.weathercode == 75) {
+                    document.getElementById("weathercode").innerText = 'Snow fall: Heavy';
+                } else if (weather.weathercode == 77) {
+                    document.getElementById("weathercode").innerText = 'Snow grains';
+                } else if (weather.weathercode == 80) {
+                    document.getElementById("weathercode").innerText = 'Rain showers: Slight';
+                } else if (weather.weathercode == 81) {
+                    document.getElementById("weathercode").innerText = 'Rain showers: Moderate';
+                } else if (weather.weathercode == 82) {
+                    document.getElementById("weathercode").innerText = 'Rain showers: Violent';
+                } else if (weather.weathercode == 95) {
+                    document.getElementById("weathercode").innerText = 'Thunderstorm: Slight or moderate';
+                } else if (weather.weathercode == 96) {
+                    document.getElementById("weathercode").innerText = 'Thunderstorm with slight hail';
+                } else if (weather.weathercode == 99) {
+                    document.getElementById("weathercode").innerText = 'Thunderstorm with heavy hail';
+                } else {
+                    document.getElementById("weathercode").innerText = 'Current weather';
+                }
+
+            } catch (error) {
+                document.getElementById("loading").style.display = "none";
+                alert("Error fetching weather data.");
+            }
+        }
+
+        // Function to determine the time of day
+        function getTimeOfDay() {
+            let hours = new Date().getHours();
+            if (hours >= 6 && hours < 12) {
+                return "morning";
+            } else if (hours >= 12 && hours < 18) {
+                return "afternoon";
+            } else if (hours >= 18 && hours < 21) {
+                return "evening";
+            } else {
+                return "night";
+            }
+        }
+
+        // Function to set the background based on weather and time of day
+        function setBackground(lat, lon, weather) {
+            let timeOfDay = getTimeOfDay();
+            let weatherCode = weather.weathercode;
+
+            console.log(`Time of Day: ${timeOfDay}, Weather Code: ${weatherCode}`); // Debug log
+
+            let backgroundImage = '';
+            // Set background image based on weather code and time of day
+            if (weatherCode == 0 || weatherCode == 1) { // Clear
+                backgroundImage = timeOfDay === "night" ? "url('night_clear.jpg')" : "url('day_clear.jpg')";
+            
+            } else if (weatherCode == 2) { // Partly Cloudy
+                backgroundImage = timeOfDay === "night" ? "url('night_partly_cloudy.jpg')" : "url('day_partly_cloudy.jpg')";
+
+            } else if (weatherCode == 45 || weatherCode == 48) { // Fog
+                backgroundImage = timeOfDay === "night" ? "url('night_fog.jpg')" : "url('day_fog.jpg')";
+            
+            } else if (weatherCode == 3) { // Cloudy
+                backgroundImage = timeOfDay === "night" ? "url('night_cloudy.jpg')" : "url('day_cloudy.jpg')";
+            
+            } else if (weatherCode == 51 || weatherCode == 53 || weatherCode == 55 || weatherCode == 56 || weatherCode == 57 || weatherCode == 61 || weatherCode == 63 || weatherCode == 65 || weatherCode == 66 || weatherCode == 67 || weatherCode == 80 || weatherCode == 81 || weatherCode == 82) { // Rain
+                backgroundImage = timeOfDay === "night" ? "url('night_rainy.gif')" : "url('day_rainy.gif')";
+            
+            } else if (weatherCode == 95 || weatherCode == 96 || weatherCode == 99) { // thunderstorms
+                backgroundImage = timeOfDay === "night" ? "url('night_thunderstorms.gif')" : "url('day_thunderstorms.gif')";
+            
+            } else if (weatherCode == 71 || weatherCode == 73 || weatherCode == 75 || weatherCode == 77 || weatherCode == 85 || weatherCode == 86) { // Snow
+                backgroundImage = timeOfDay === "night" ? "url('night_snow.gif')" : "url('day_snow.gif')";
+            
+            }
+
+            document.body.style.backgroundImage = backgroundImage;
+        }
+
+        // Function to get the user's location using the Geolocation API
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+
+                    // Auto-fill the latitude and longitude input fields
+                    document.getElementById("latitude").value = lat;
+                    document.getElementById("longitude").value = lon;
+                }, function(error) {
+                    alert("Error getting location: " + error.message);
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
+</body>
+</html>
