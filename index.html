@@ -80,6 +80,44 @@
             font-size: 1.5em;
             color: #666;
         }
+
+        /* Settings button */
+        .settings-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+        .settings-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .settings-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Dropdown menu */
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .dropdown label {
+            display: block;
+        }
+        
     </style>
 </head>
 <body>
@@ -108,6 +146,10 @@
         const API_KEY = "uHLGMYnMwgfCTIJrUmCZJg==P7ghZabbnqbl2hIX"; // Your API Ninja key
 
         async function getWeather() {
+
+            document.getElementById("tempToggle").checked = false;
+            document.getElementById("windToggle").checked = false;
+
             let lat = document.getElementById("latitude").value;
             let lon = document.getElementById("longitude").value;
 
@@ -197,7 +239,9 @@
                 document.getElementById("feels-like").innerText = `Feels Like: ${data.feels_like}°C`;
                 document.getElementById("humidity").innerText = `Humidity: ${data.humidity}%`;
                 document.getElementById("cloud-cover").innerText = `Cloud Cover: ${data.cloud_pct}%`;
-                document.getElementById("windspeed").innerText = `Wind Speed: ${data.wind_speed} mph`;
+                document.getElementById("windspeed").innerText = `Wind Speed: ${(data.wind_speed * 0.44704).toFixed(2)} m/s`;
+                    windSpeedMps = (data.wind_speed * 0.44704); // Store for toggle function
+
 
                 document.getElementById("loading").style.display = "none";
                 document.getElementById("weather-result").style.display = "block";
@@ -226,6 +270,7 @@
             let timeOfDay = getTimeOfDay(lon);
             let backgroundImage = '';
 
+            // FOR GITHUB I ADDED "Working Weather/" BEFORE EVERY JPG AND GIF FOR EXAMPLE -> Working Weather/night_clear.jpg
             if (weather.weathercode == 0 || weather.weathercode == 1) { // Clear
                 backgroundImage = timeOfDay === "night" ? "url('Working Weather/night_clear.jpg')" : "url('Working Weather/day_clear.jpg')";
             } else if (weather.weathercode == 2) { // Partly Cloudy
@@ -260,5 +305,88 @@
             }
         }
     </script>
+
+
+    <!-- Settings Button -->
+    <div class="settings-container">
+        <button class="settings-btn" onclick="toggleDropdown()">Settings</button>
+        <div class="dropdown" id="settingsMenu">
+            <label>
+                <input type="checkbox" id="tempToggle"> Show Temp in °F
+            </label>
+            <label>
+                <input type="checkbox" id="windToggle"> Show Wind Speed in mph
+            </label>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            let menu = document.getElementById("settingsMenu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        }
+
+        document.getElementById("tempToggle").addEventListener("change", function() {
+    let tempText = document.getElementById("temperature").innerText;
+    let dewText = document.getElementById("dewpoint").innerText;
+    let feelsLikeText = document.getElementById("feels-like").innerText;
+
+    let tempValueMatch = tempText.match(/-?\d+(\.\d+)?/);
+    let dewValueMatch = dewText.match(/-?\d+(\.\d+)?/);
+    let feelsLikeMatch = feelsLikeText.match(/-?\d+(\.\d+)?/);
+
+    if (!tempValueMatch || !dewValueMatch) return; // Exit if no valid numbers found
+
+    let tempValue = parseFloat(tempValueMatch[0]);
+    let dewValue = parseFloat(dewValueMatch[0]);
+    let feelsLikeValue = parseFloat(feelsLikeMatch[0]);
+
+    let newTemp, newDew, newFeelsLike, newUnit;
+
+    if (this.checked) {
+        newTemp = (tempValue * 9/5) + 32;
+        newDew = (dewValue * 9/5) + 32;
+        newFeelsLike = (feelsLikeValue * 9/5) + 32;
+        newUnit = "°F";
+    } else {
+        newTemp = (tempValue - 32) * 5/9;
+        newDew = (dewValue - 32) * 5/9;
+        newFeelsLike = (feelsLikeValue - 32) * 5/9;
+        newUnit = "°C";
+    }
+
+    document.getElementById("temperature").innerText = `Temperature: ${newTemp.toFixed(1)}${newUnit}`;
+    document.getElementById("dewpoint").innerText = `Dewpoint: ${newDew.toFixed(1)}${newUnit}`;
+    document.getElementById("feels-like").innerText = `Feels Like: ${newFeelsLike.toFixed(1)}${newUnit}`;
+});
+
+let windSpeedMps; // Declare a global variable to store wind speed in m/s
+
+document.getElementById("windToggle").addEventListener("change", function() {
+    let windSpeedElement = document.getElementById("windspeed");
+
+    if (!windSpeedMps) return; // Prevent running if wind speed is undefined
+
+    if (this.checked) {
+        let windSpeedMph = (windSpeedMps / 0.44704).toFixed(2);
+        windSpeedElement.textContent = `Wind Speed: ${windSpeedMph} mph`;
+    } else {
+        windSpeedElement.textContent = `Wind Speed: ${windSpeedMps.toFixed(2)} m/s`;
+    }
+});
+
+
+
+        // Close dropdown if clicked outside
+        document.addEventListener("click", function(event) {
+            let menu = document.getElementById("settingsMenu");
+            let button = document.querySelector(".settings-btn");
+
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+                menu.style.display = "none";
+            }
+        });
+    </script>
+
 </body>
 </html>
