@@ -134,6 +134,24 @@
            0% { transform: rotate(0deg); }
            100% { transform: rotate(360deg); }
         }
+
+        .weather-info {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 2em;
+            color: #deee00;
+            text-shadow: 1px 1px 2px #000;
+            opacity: 0; /* Start invisible */
+            animation: fadeIn 0.5s ease-in forwards; /* Fade-in animation */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 
@@ -145,8 +163,10 @@
         <h1>Weather Wizard</h1>
         <input type="text" id="latitude" placeholder="Enter Latitude" />
         <input type="text" id="longitude" placeholder="Enter Longitude" />
-        <button onclick="getWeather()">Get Weather</button>
+
         <button onclick="getLocation()">Use My Location</button>
+        <button onclick="getWeather()">Get Weather</button>
+        
         <div id="loading" class="loading">
             <div class="loading-spinner"></div>
             <p>Loading weather data...</p>
