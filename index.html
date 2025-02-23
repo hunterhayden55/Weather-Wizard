@@ -27,7 +27,7 @@
             background-repeat: no-repeat;
             background-position: center;
             height: 100vh;
-            background-image: url('tornado.jpg');
+            background-image: url('Working Weather/tornado.jpg');
             background-attachment: fixed;
         }
         .container {
@@ -536,29 +536,29 @@
         let backgroundImage = '';
         if (weather.weathercode <= 3) {
             if (cloud_pct < 10) {
-                backgroundImage = isDayTime ? "url('day_clear.jpg')" : "url('night_clear.png')";
+                backgroundImage = isDayTime ? "url('Working Weather/day_clear.jpg')" : "url('Working Weather/night_clear.png')";
             } else if (cloud_pct >= 10 && cloud_pct < 70) {
-                backgroundImage = isDayTime ? "url('day_partly_cloudy.png')" : "url('night_partly_cloudy.png')";
+                backgroundImage = isDayTime ? "url('Working Weather/day_partly_cloudy.png')" : "url('Working Weather/night_partly_cloudy.png')";
             } else {
-                backgroundImage = isDayTime ? "url('day_cloudy.png')" : "url('night_cloudy.png')";
+                backgroundImage = isDayTime ? "url('Working Weather/day_cloudy.png')" : "url('Working Weather/night_cloudy.png')";
             }
         }
         else if (weather.weathercode === 45 || weather.weathercode === 48) {
-            backgroundImage = isDayTime ? "url('day_fog.png')" : "url('night_fog.png')";
+            backgroundImage = isDayTime ? "url('Working Weather/day_fog.png')" : "url('Working Weather/night_fog.png')";
         }
         else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weather.weathercode)) {
-            backgroundImage = isDayTime ? "url('day_rainy.png')" : "url('night_rainy.png')";
+            backgroundImage = isDayTime ? "url('Working Weather/day_rainy.png')" : "url('Working Weather/night_rainy.png')";
         }
         else if ([95, 96, 99].includes(weather.weathercode)) {
-            backgroundImage = isDayTime ? "url('day_thunderstorms.png')" : "url('night_thunderstorms.png')";
+            backgroundImage = isDayTime ? "url('Working Weather/day_thunderstorms.png')" : "url('Working Weather/night_thunderstorms.png')";
         }
         else if ([71, 73, 75, 77, 85, 86].includes(weather.weathercode)) {
-            backgroundImage = isDayTime ? "url('day_snow.png')" : "url('night_snow.png')";
+            backgroundImage = isDayTime ? "url('Working Weather/day_snow.png')" : "url('Working Weather/night_snow.png')";
        }
         if (backgroundImage) {
             document.body.style.backgroundImage = backgroundImage;
         } else {
-            document.body.style.backgroundImage = isDayTime ? "url('day_clear.jpg')" : "url('night_clear.png')";
+            document.body.style.backgroundImage = isDayTime ? "url('Working Weather/day_clear.jpg')" : "url('Working Weather/night_clear.png')";
         }
     }
 
