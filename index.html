@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
+    <!-- Google Analytics (optional) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XHNWC0P47P"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -10,11 +10,18 @@
         gtag('config', 'G-XHNWC0P47P');
     </script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Weather Wizard</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
+        /* ---------------- Global Reset & Body ---------------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -36,85 +43,101 @@
             z-index: -1;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 50px;
+        /* ---------------- Header ---------------- */
+        header {
             text-align: center;
+            padding: 1.5rem;
+            background-color: #292929;
         }
-        h1 {
-            font-size: 2.5em;
-            color: #0099ff;
-            margin-bottom: 20px;
-            background-color: #c8f2ffc5;
-            padding: 10px;
-            border-radius: 10px;
+        header h1 {
+            font-size: 2.5rem;
+            color: #f5f84f;
         }
-        input, button {
-            padding: 10px;
-            font-size: 1em;
+
+        /* ---------------- Search Section ---------------- */
+        .search-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .search-section input {
+            padding: 0.5rem;
+            font-size: 1rem;
             border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid #1b1b1b;
+            width: 200px;
+            background-color: #313131;
+            color: #f5f84f;
         }
-        input {
-            width: 30%;
-            margin-right: 10px;
+        .search-section input::placeholder {
+            color: #f5f84f;
+            opacity: 0.7;
         }
-        button {
-            background-color: #3b8bdb;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #2978b5;
-        }
-    
-        .weather-info p {
-            font-size: 1.2em;
-        }
-        .loading {
-            display: none;
-            font-size: 1.5em;
-            color: #666;
-        }
-        .settings-container {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-        .settings-btn {
-            background-color: #3498db;
-            color: white;
+        .search-section button {
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            border-radius: 5px;
             border: none;
-            padding: 10px 15px;
+            background-color: #313131;
+            color: #f5f84f;
             cursor: pointer;
-            border-radius: 5px;
         }
-        .settings-btn:hover {
-            background-color: #2980b9;
+        .search-section button:hover {
+            background-color: #009148;
         }
-        .dropdown {
-            display: none;
-            position: absolute;
-            top: 40px;
-            left: 10px;
-            background: white;
-            border: 1px solid #ccc;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 5px;
+
+        /* ---------------- Main Content Layout ---------------- */
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
-        .dropdown label {
-            display: block;
+
+        /* ---------------- Temp Section ---------------- */
+        .temp-section {
+            background-color: #313131;
+            padding: 1.5rem;
+            border-radius: 10px;
+            min-width: 250px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .loading {
+        .temp-section h2 {
+            color: #f5f84f;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        .temp-section p {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #f5f84f;
+        }
+
+        /* ---------------- Weather Icon Placeholder ---------------- */
+        .weather-icon-placeholder {
+            width: 300px;
+            height: 300px;
+            background-color: #313131;
+            border-radius: 10px;
+            align-self: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #f5f84f;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* ---------------- Loading Spinner ---------------- */
+        #loading {
             display: none;
             text-align: center;
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #666;
+            margin: 1rem auto;
         }
         .loading-spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
@@ -129,48 +152,90 @@
            0% { transform: rotate(0deg); }
            100% { transform: rotate(360deg); }
         }
+
+        /* ---------------- Hidden Full Weather Info ---------------- */
         .weather-info {
-            margin-top: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            font-size: 2em;
-            color: #deee00;
-            text-shadow: 1px 1px 2px #000;
-            opacity: 0;
-            animation: fadeIn 0.5s ease-in forwards;
+            display: none;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        /* ---------------- Settings Button & Dropdown (Optional) ---------------- */
+        .settings-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+        .settings-btn {
+            background-color: #313131;
+            color: #f5f84f;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .settings-btn:hover {
+            background-color: #009148;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: #313131;
+            border: 1px solid #1a1a1a;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            color: #f5f84f;
+        }
+        .dropdown label {
+            display: block;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Header -->
+    <header>
         <h1>Weather Wizard</h1>
-        <input type="text" id="latitude" placeholder="Enter Latitude" />
-        <input type="text" id="longitude" placeholder="Enter Longitude" />
+    </header>
 
+    <!-- Input/Buttons Row -->
+    <div class="search-section">
+        <input type="text" id="latitude" placeholder="Enter Latitude..." />
+        <input type="text" id="longitude" placeholder="Enter Longitude..." />
+        <button onclick="getWeather()">Get Weather!</button>
         <button onclick="getLocation()">Use My Location</button>
-        <button onclick="getWeather()">Get Weather</button>
-        
-        <div id="loading" class="loading">
-            <div class="loading-spinner"></div>
-            <p>Loading weather data...</p>
+    </div>
+
+    <!-- Main Content: Temp Data + Placeholder -->
+    <div class="main-content">
+        <div class="temp-section">
+            <h2>Temp Data</h2>
+            <p id="temperature">Current Temp: -- °C</p>
+            <p id="feels-like">Real Feel: -- °C</p>
+            <p id="dewpoint">Dew Point: -- °C</p>
+            <div class="weather-info" id="weather-result">
+                <p id="humidity"></p>
+                <p id="pressure"></p>
+                <p id="windspeed"></p>
+                <p id="cloud-cover"></p>
+                <p id="weathercode"></p>
+            </div>
         </div>
-        <div id="weather-result" class="weather-info" style="display: none;">
-            <p id="temperature"></p>
-            <p id="feels-like"></p>
-            <p id="dewpoint"></p>
-            <p id="humidity"></p>
-            <p id="pressure"></p>
-            <p id="windspeed"></p>
-            <p id="cloud-cover"></p>
-            <p id="weathercode"></p>
+
+        <!-- Weather icon placeholder that will update dynamically -->
+        <div class="weather-icon-placeholder">
+            <img src="Day_PartlyCloudy_Icon.png" alt="Weather Icon" width="200" height="200" />
         </div>
     </div>
+
+    <!-- Loading spinner -->
+    <div id="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading weather data...</p>
+    </div>
+
+    <!-- Settings Button & Dropdown (Optional) -->
     <div class="settings-container">
         <button class="settings-btn" onclick="toggleDropdown()">Settings</button>
         <div class="dropdown" id="settingsMenu">
@@ -183,42 +248,113 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script>
-    // ----------------ALL FUNCTIONS SHOWN BELOW HERE--------------------
+    // ------------------- Global Variables & Helpers -------------------
     let windSpeedMps;
+    const TOMORROW_API_KEY = "Ds5H8N8TLTUpZvz9GfxpwgeRs3cOO4uk";
 
     function convertTemp(celsius) {
-        return document.getElementById("tempToggle").checked ? 
-               (celsius * 9/5) + 32 : 
+        return document.getElementById("tempToggle").checked ?
+               (celsius * 9/5) + 32 :
                celsius;
     }
-
     function getTempUnit() {
         return document.getElementById("tempToggle").checked ? "°F" : "°C";
     }
-
     function convertWindSpeed(mps) {
-        return document.getElementById("windToggle").checked ? 
-               (mps / 0.44704).toFixed(2) + " mph" : 
+        return document.getElementById("windToggle").checked ?
+               (mps / 0.44704).toFixed(2) + " mph" :
                mps.toFixed(2) + " m/s";
     }
-
     function showLoading() {
         document.getElementById("loading").style.display = "block";
     }
-
     function hideLoading() {
         document.getElementById("loading").style.display = "none";
     }
 
+    // ------------------- Sun Times & Icon Mapping -------------------
+    async function getSunTimes(lat, lon) {
+        try {
+            const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}&formatted=0`);
+            const data = await response.json();
+            let sunrise = new Date(data.results.sunrise);
+            let sunset = new Date(data.results.sunset);
+            return { sunrise, sunset };
+        } catch (error) {
+            console.error("Error fetching sun times:", error);
+            // Fallback: assume sunrise at 6 AM and sunset at 6 PM local time
+            let today = new Date();
+            let sunrise = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 6, 0, 0);
+            let sunset = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 18, 0, 0);
+            return { sunrise, sunset };
+        }
+    }
 
+    function getIcon(weatherCode, isDay) {
+        let icon = "";
+        switch(weatherCode) {
+            case 1000:
+                icon = isDay ? "Day_Clear_Icon.png" : "Night_Clear_Icon.png";
+                break;
+            case 1100:
+                icon = isDay ? "Day_Clear_Icon.png" : "Night_Clear_Icon.png";
+                break;
+            case 1101:
+                icon = isDay ? "Day_PartlyCloudy_Icon.png" : "Night_PartlyCloudy_Icon.png";
+                break;
+            case 1102:
+                icon = isDay ? "Day_MostlyCloudy_Icon.png" : "Night_MostlyCloudy_Icon.png";
+                break;
+            case 1001:
+                icon = "Overcast_Icon.png";
+                break;
+            case 2000:
+            case 2100:
+                icon = "Fog_Icon.png";
+                break;
+            case 4000:
+            case 4200:
+            case 6000:
+            case 6200:
+                icon = isDay ? "Day_LightRain_Icon.png" : "Night_LightRain_Icon.png";
+                break;
+            case 4001:
+            case 6001:
+                icon = "Rain_Icon.png";
+                break;
+            case 4201:
+            case 6201:
+                icon = "HeavyRain_Icon.png";
+                break;
+            case 5000:
+                icon = "Snow_Icon.png";
+                break;
+            case 5100:
+            case 5001:
+                icon = isDay ? "Day_LightSnow_Icon.png" : "Night_LightSnow_Icon.png";
+                break;
+            case 5101:
+                icon = "HeavySnow_Icon.png";
+                break;
+            case 7101:
+                icon = "HeavyHail_Icon.png";
+                break;
+            case 7102:
+            case 7000:
+                icon = "Hail_Icon.png";
+                break;
+            case 8000:
+                icon = "Thunderstorm_Icon.png";
+                break;
+            default:
+                icon = isDay ? "Day_Clear_Icon.png" : "Night_Clear_Icon.png";
+        }
+        return icon;
+    }
 
-
-
-
-
-    const TOMORROW_API_KEY = "Ds5H8N8TLTUpZvz9GfxpwgeRs3cOO4uk";
-
+    // ------------------- Main Weather Fetch -------------------
     async function getWeather() {
         let lat = parseFloat(document.getElementById("latitude").value);
         let lon = parseFloat(document.getElementById("longitude").value);
@@ -226,8 +362,8 @@
             alert("Please enter both latitude and longitude.");
             return;
         }
-
         showLoading();
+        // Hide extra data until new data is fetched
         document.getElementById("weather-result").style.display = "none";
 
         try {
@@ -249,22 +385,36 @@
 
             let tempC = values.temperature;
             let dewC = values.dewPoint;
-            let windSpeed = values.windSpeed;
-            windSpeedMps = windSpeed;  // Set the global windSpeedMps variable here
             let humidity = values.humidity;
-            let cloudCover = values.cloudCover;
             let pressure = values.pressureSeaLevel;
+            let windSpeed = values.windSpeed;
+            windSpeedMps = windSpeed;
             let weatherCode = values.weatherCode;
+            let cloudCover = values.cloudCover;
 
-            document.getElementById("temperature").innerText = `Temperature: ${convertTemp(tempC).toFixed(1)}${getTempUnit()}`;
-            document.getElementById("feels-like").innerText = `Feels Like: ${convertTemp(values.temperatureApparent).toFixed(1)}${getTempUnit()}`;
+            // Update the main three lines
+            document.getElementById("temperature").innerText =
+                `Current Temp: ${convertTemp(tempC).toFixed(1)}${getTempUnit()}`;
+            document.getElementById("feels-like").innerText =
+                `Real Feel: ${convertTemp(values.temperatureApparent).toFixed(1)}${getTempUnit()}`;
+            document.getElementById("dewpoint").innerText =
+                `Dew Point: ${convertTemp(dewC).toFixed(1)}${getTempUnit()}`;
+
+            // Populate hidden extra data
             document.getElementById("humidity").innerText = `Humidity: ${humidity}%`;
             document.getElementById("pressure").innerText = `Pressure: ${pressure.toFixed(1)} hPa`;
-            document.getElementById("dewpoint").innerText = `Dewpoint: ${convertTemp(dewC).toFixed(1)}${getTempUnit()}`;
             document.getElementById("windspeed").innerText = `Wind Speed: ${convertWindSpeed(windSpeed)}`;
             document.getElementById("cloud-cover").innerText = `Cloud Cover: ${Math.round(cloudCover)}%`;
             document.getElementById("weathercode").innerText = getWeatherDescription(weatherCode);
 
+            // Determine sunrise/sunset and whether it is day or night
+            const { sunrise, sunset } = await getSunTimes(lat, lon);
+            const now = new Date();
+            const isDay = now >= sunrise && now < sunset;
+            const iconFile = getIcon(weatherCode, isDay);
+            document.querySelector('.weather-icon-placeholder img').src = iconFile;
+
+            // Show extra data
             document.getElementById("weather-result").style.display = "block";
         } catch (error) {
             alert("Error fetching Tomorrow.io weather data.");
@@ -301,7 +451,7 @@
         return descriptions[code] || "Unknown weather";
     }
 
-
+    // ------------------- Location -------------------
     function getLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -317,11 +467,20 @@
         }
     }
 
+    // ------------------- Settings Toggling -------------------
     function toggleDropdown() {
         let menu = document.getElementById("settingsMenu");
         menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
+    document.addEventListener("click", function(event) {
+        let menu = document.getElementById("settingsMenu");
+        let button = document.querySelector(".settings-btn");
+        if (menu && button && !menu.contains(event.target) && !button.contains(event.target)) {
+            menu.style.display = "none";
+        }
+    });
 
+    // Toggle for temperature
     document.getElementById("tempToggle").addEventListener("change", function() {
         let tempText = document.getElementById("temperature").innerText;
         let dewText = document.getElementById("dewpoint").innerText;
@@ -331,14 +490,13 @@
         let dewValueMatch = dewText.match(/-?\d+(\.\d+)?/);
         let feelsLikeMatch = feelsLikeText.match(/-?\d+(\.\d+)?/);
 
-        if (!tempValueMatch || !dewValueMatch) return;
+        if (!tempValueMatch || !dewValueMatch || !feelsLikeMatch) return;
 
         let tempValue = parseFloat(tempValueMatch[0]);
         let dewValue = parseFloat(dewValueMatch[0]);
         let feelsLikeValue = parseFloat(feelsLikeMatch[0]);
 
         let newTemp, newDew, newFeelsLike, newUnit;
-
         if (this.checked) {
             newTemp = (tempValue * 9/5) + 32;
             newDew = (dewValue * 9/5) + 32;
@@ -350,24 +508,16 @@
             newFeelsLike = (feelsLikeValue - 32) * 5/9;
             newUnit = "°C";
         }
-
-        document.getElementById("temperature").innerText = `Temperature: ${newTemp.toFixed(1)}${newUnit}`;
-        document.getElementById("dewpoint").innerText = `Dewpoint: ${newDew.toFixed(1)}${newUnit}`;
-        document.getElementById("feels-like").innerText = `Feels Like: ${newFeelsLike.toFixed(1)}${newUnit}`;
+        document.getElementById("temperature").innerText = `Current Temp: ${newTemp.toFixed(1)}${newUnit}`;
+        document.getElementById("dewpoint").innerText = `Dew Point: ${newDew.toFixed(1)}${newUnit}`;
+        document.getElementById("feels-like").innerText = `Real Feel: ${newFeelsLike.toFixed(1)}${newUnit}`;
     });
 
+    // Toggle for wind speed
     document.getElementById("windToggle").addEventListener("change", function() {
         let windSpeedElement = document.getElementById("windspeed");
         if (!windSpeedMps) return;
         windSpeedElement.textContent = `Wind Speed: ${convertWindSpeed(windSpeedMps)}`;
-    });
-
-    document.addEventListener("click", function(event) {
-        let menu = document.getElementById("settingsMenu");
-        let button = document.querySelector(".settings-btn");
-        if (!menu.contains(event.target) && !button.contains(event.target)) {
-            menu.style.display = "none";
-        }
     });
     </script>
 </body>
