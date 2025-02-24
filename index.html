@@ -68,7 +68,7 @@
             font-size: 1rem;
             border-radius: 5px;
             border: 1px solid #1b1b1b;
-            width: 200px;
+            width: 250px;
             background-color: #313131;
             color: #f5f84f;
         }
@@ -103,7 +103,7 @@
             background-color: #313131;
             padding: 1.5rem;
             border-radius: 10px;
-            min-width: 250px;
+            min-width: 350px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .temp-section h2 {
@@ -203,17 +203,22 @@
     <div class="search-section">
         <input type="text" id="latitude" placeholder="Enter Latitude..." />
         <input type="text" id="longitude" placeholder="Enter Longitude..." />
-        <button onclick="getWeather()">Get Weather!</button>
         <button onclick="getLocation()">Use My Location</button>
+        <button onclick="getWeather()">Get Weather!</button>
     </div>
 
     <!-- Main Content: Temp Data + Placeholder -->
     <div class="main-content">
         <div class="temp-section">
-            <h2>Temp Data</h2>
-            <p id="temperature">Current Temp: -- °C</p>
-            <p id="feels-like">Real Feel: -- °C</p>
-            <p id="dewpoint">Dew Point: -- °C</p>
+            <h2>Weather Data</h2>
+            <p id="temperature">Current Temp: -- °C / F</p>
+            <p id="feels-like">Real Feel: -- °C / F</p>
+            <p id="dewpoint">Dew Point: -- °C / F</p>
+            <p id="humidity">Humidity: -- %</p>
+            <p id="pressure">Pressure: -- hPA</p>
+            <p id="windspeed">Wind Speed: -- m/s / mph</p>
+            <p id="cloud-cover">Cloud Cover: -- %</p>
+            <p id="weathercode">Current Weather: --</p>
             <div class="weather-info" id="weather-result">
                 <p id="humidity"></p>
                 <p id="pressure"></p>
@@ -405,7 +410,7 @@
             document.getElementById("pressure").innerText = `Pressure: ${pressure.toFixed(1)} hPa`;
             document.getElementById("windspeed").innerText = `Wind Speed: ${convertWindSpeed(windSpeed)}`;
             document.getElementById("cloud-cover").innerText = `Cloud Cover: ${Math.round(cloudCover)}%`;
-            document.getElementById("weathercode").innerText = getWeatherDescription(weatherCode);
+            document.getElementById("weathercode").innerText = "Current Weather: " + getWeatherDescription(weatherCode);
 
             // Determine sunrise/sunset and whether it is day or night
             const { sunrise, sunset } = await getSunTimes(lat, lon);
