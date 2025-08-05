@@ -13,7 +13,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather Wizard Dashboard</title>
+  <title>Weather Wizard Dashboard 2.0</title>
   <style>
     :root {
       --primary-glow: #8a2be2;
@@ -21,6 +21,7 @@
       --text-color: #ffffff;
       --panel-bg: rgba(20, 20, 30, 0.7);
       --panel-border: rgba(80, 80, 100, 0.3);
+      --error-color: #ff4d4d;
     }
 
     @keyframes gradientSheen {
@@ -187,6 +188,11 @@
       cursor: pointer;
       position: relative;
       z-index: 2;
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 0;
     }
 
     .nav-item:hover {
@@ -202,18 +208,21 @@
       height: auto;
     }
 
-    /* Styles for the location input panel */
     .location-panel input {
-      padding: 8px;
+      padding: 10px;
       border: none;
       border-radius: 5px;
       margin: 5px;
       background: rgba(255, 255, 255, 0.1);
       color: var(--text-color);
+      width: 60%;
+      max-width: 300px;
+      text-align: center;
+      font-size: 1rem;
     }
 
     .location-panel button {
-      padding: 8px 16px;
+      padding: 10px 20px;
       border: none;
       border-radius: 5px;
       margin: 5px;
@@ -221,9 +230,9 @@
       font-weight: bold;
       position: relative;
       overflow: hidden;
+      font-size: 0.9rem;
     }
 
-    /* Button sheen effect */
     .btn-sheen::before {
       content: '';
       position: absolute;
@@ -240,7 +249,6 @@
       left: 150%;
     }
 
-    /* Temperature styles */
     .temp-main {
       font-size: 3.5rem;
       font-weight: bold;
@@ -253,12 +261,12 @@
       margin-top: -5px;
     }
 
-    /* 5-day forecast styles */
     .forecast-icons {
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       margin-top: 15px;
       width: 100%;
+      flex-wrap: wrap;
     }
 
     .forecast-day {
@@ -266,6 +274,15 @@
       flex-direction: column;
       align-items: center;
       font-size: 0.8rem;
+      min-width: 80px;
+      margin: 5px;
+    }
+    .forecast-day .desc {
+      font-style: italic;
+      opacity: 0.7;
+      font-size: 0.75rem;
+      height: 2.5em; /* Reserve space for description */
+      text-align: center;
     }
 
     .forecast-day img {
@@ -274,10 +291,9 @@
       margin-bottom: 5px;
     }
 
-    /* Extra info styles */
     .extra-info-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
       width: 100%;
       text-align: left;
@@ -291,7 +307,7 @@
 
     .info-label {
       font-weight: bold;
-      margin-right: 5px;
+      margin-right: 8px;
       opacity: 0.8;
     }
 
@@ -303,30 +319,56 @@
       font-weight: bold;
     }
 
-    /* Settings Panel styles */
+    .status-message {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 10px;
+      margin: -10px 0 10px 0;
+      border-radius: 8px;
+      display: none; /* Hidden by default */
+    }
+    .status-message.error {
+      background-color: rgba(255, 77, 77, 0.2);
+      color: var(--error-color);
+    }
+    .status-message.loading {
+      background-color: rgba(138, 43, 226, 0.2);
+      color: var(--primary-glow);
+    }
+
     .settings-panel {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.95);
       z-index: 1000;
-      background: rgba(30, 30, 45, 0.9);
-      padding: 20px;
-      border-radius: 10px;
-      display: none; /* Hide by default */
+      background: rgba(30, 30, 45, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .settings-panel.visible {
+      visibility: visible;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
   
     .settings-panel h3 {
+      margin-top: 0;
       margin-bottom: 20px;
       color: var(--text-color);
     }
   
-    /* Toggle switch styles */
     .switch {
       position: relative;
       display: inline-block;
       width: 60px;
       height: 34px;
+      vertical-align: middle;
+      margin-left: 10px;
     }
   
     .switch input {
@@ -367,7 +409,6 @@
       transform: translateX(26px);
     }
 
-    /* Floating animation for panels */
     @keyframes float {
       0% {
         transform: perspective(1000px) translateZ(15px) translateY(0px);
@@ -387,16 +428,15 @@
         <span style="margin-left: 10px; letter-spacing: 1px;">Weather Wizard</span>
       </div>
       <div style="display: flex; position: relative; z-index: 2;">
-        <div id="home-btn" class="nav-item">HOME</div>
-        <div class="nav-item">RADAR</div>
-        <div id="settings-btn" class="nav-item">SETTINGS</div>
+        <button id="home-btn" class="nav-item">HOME</button>
+        <button id="settings-btn" class="nav-item">SETTINGS</button>
       </div>
     </div>
 
     <!-- Settings Panel -->
     <div id="settings-panel" class="settings-panel">
       <h3>Settings <span id="close-settings" style="float: right; cursor: pointer;">✕</span></h3>
-      <label style="color: var(--text-color);">
+      <label style="color: var(--text-color); display: flex; align-items: center;">
         Use Celsius (°C)
         <div class="switch">
           <input type="checkbox" id="unit-toggle">
@@ -410,8 +450,7 @@
       <div class="panel-content">
         <h3>Enter Your Location</h3>
         <div style="margin: 10px 0;">
-          <input id="lat-input" type="text" placeholder="Latitude">
-          <input id="lon-input" type="text" placeholder="Longitude">
+          <input id="city-input" type="text" placeholder="Enter City Name">
         </div>
         <div>
           <button id="get-weather-btn" class="btn-sheen" style="background: var(--primary-glow); color: var(--text-color);">Get Weather!</button>
@@ -419,6 +458,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Status Message Panel -->
+    <div id="status-message" class="status-message"></div>
 
     <!-- Temperature Box -->
     <div class="panel">
@@ -432,42 +474,52 @@
     <!-- Weather Icon Box -->
     <div class="panel">
       <div class="panel-content">
-        <img id="weather-icon" src="Day_Clear_Icon.png" alt="Day Clear Icon" style="width: 100px;">
+        <img id="weather-icon" src="Day_Clear_Icon.png" alt="Weather Icon" style="width: 100px;">
       </div>
       <div id="current-weather-text" class="current-weather">
         Current Weather: --
       </div>
     </div>
 
-    <!-- Forecast Box (Wide) - Updated to 5 days with dates -->
+    <!-- Forecast Box (Wide) -->
     <div class="panel large-panel">
       <div class="panel-content">
-        <h3>Forecast</h3>
+        <h3>5-Day Forecast</h3>
         <div class="forecast-icons">
+          <!-- Day 1 -->
           <div class="forecast-day">
             <span>--/--</span>
-            <img src="Day_Clear_Icon.png" alt="Day Clear Icon">
-            <span>--°F</span>
+            <img src="Day_Clear_Icon.png" alt="Forecast Icon">
+            <span class="desc">--</span>
+            <span>--°F / --°F</span>
           </div>
+          <!-- Day 2 -->
           <div class="forecast-day">
             <span>--/--</span>
-            <img src="Day_Clear_Icon.png" alt="Day Clear Icon">
-            <span>--°F</span>
+            <img src="Day_Clear_Icon.png" alt="Forecast Icon">
+            <span class="desc">--</span>
+            <span>--°F / --°F</span>
           </div>
+          <!-- Day 3 -->
           <div class="forecast-day">
             <span>--/--</span>
-            <img src="Day_Clear_Icon.png" alt="Day Clear Icon">
-            <span>--°F</span>
+            <img src="Day_Clear_Icon.png" alt="Forecast Icon">
+            <span class="desc">--</span>
+            <span>--°F / --°F</span>
           </div>
+          <!-- Day 4 -->
           <div class="forecast-day">
             <span>--/--</span>
-            <img src="Day_Clear_Icon.png" alt="Day Clear Icon">
-            <span>--°F</span>
+            <img src="Day_Clear_Icon.png" alt="Forecast Icon">
+            <span class="desc">--</span>
+            <span>--°F / --°F</span>
           </div>
+          <!-- Day 5 -->
           <div class="forecast-day">
             <span>--/--</span>
-            <img src="Day_Clear_Icon.png" alt="Day Clear Icon">
-            <span>--°F</span>
+            <img src="Day_Clear_Icon.png" alt="Forecast Icon">
+            <span class="desc">--</span>
+            <span>--°F / --°F</span>
           </div>
         </div>
       </div>
@@ -494,317 +546,273 @@
             <span class="info-label">Dewpoint:</span>
             <span id="dewpoint-value">--°F</span>
           </div>
+          <div class="info-item">
+            <span class="info-label">Sunrise:</span>
+            <span id="sunrise-value">--:-- AM</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Sunset:</span>
+            <span id="sunset-value">--:-- PM</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Store original Fahrenheit values for temperature conversion
-    // Store original Fahrenheit values for temperature conversion
-let originalFahrenheit = {
-  currentTemp: null,
-  tempMax: null,
-  tempMin: null,
-  forecastTemps: []
-};
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- CONFIGURATION ---
+      // SECURITY WARNING: Do NOT expose your API key in client-side code in a real application.
+      // This should be handled by a backend server that makes the API requests.
+      const apiKey = "e7b7ac2a747ddf746dafed7974c1fe59";
 
-// Enhanced 3D hover effect for panels
-const panels = document.querySelectorAll('.panel');
-panels.forEach(panel => {
-panel.addEventListener('mousemove', (e) => {
-  const rect = panel.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  const xPercent = x / rect.width - 0.5;
-  const yPercent = y / rect.height - 0.5;
-  panel.style.transform = `perspective(1000px) translateZ(30px) rotateX(${yPercent * -8}deg) rotateY(${xPercent * 8}deg)`;
-  panel.style.boxShadow = `
-    ${-xPercent * 15}px ${-yPercent * 15}px 25px rgba(0, 0, 0, 0.2),
-    0 20px 40px rgba(0, 0, 0, 0.4)
-  `;
-});
-panel.addEventListener('mouseleave', () => {
-  panel.style.transform = 'perspective(1000px) translateZ(15px) rotateX(0deg) rotateY(0deg)';
-  panel.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.5)';
-});
-});
+      // --- DOM ELEMENTS ---
+      const cityInput = document.getElementById('city-input');
+      const getWeatherBtn = document.getElementById('get-weather-btn');
+      const useLocationBtn = document.getElementById('use-location-btn');
+      const statusMessageEl = document.getElementById('status-message');
+      const settingsBtn = document.getElementById('settings-btn');
+      const settingsPanel = document.getElementById('settings-panel');
+      const closeSettingsBtn = document.getElementById('close-settings');
+      const unitToggle = document.getElementById('unit-toggle');
+      const panels = document.querySelectorAll('.panel');
 
-// Floating animation for panels
-function animatePanels() {
-panels.forEach((panel, index) => {
-  const delay = index * 0.2;
-  const duration = 3 + Math.random() * 2;
-  panel.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
-});
-}
-animatePanels();
+      // --- STATE MANAGEMENT ---
+      let originalData = {
+        currentTemp: null,
+        tempMax: null,
+        tempMin: null,
+        dewpoint: null,
+        forecasts: [] // { high, low }
+      };
+      const savedUseCelsius = localStorage.getItem('useCelsius') === 'true';
+      unitToggle.checked = savedUseCelsius;
 
-// Navigation Tab functionality
-document.getElementById('home-btn').addEventListener('click', function() {
-location.reload();
-});
+      // --- UI & ANIMATIONS ---
 
-document.getElementById('settings-btn').addEventListener('click', function() {
-const settingsPanel = document.getElementById('settings-panel');
-settingsPanel.style.display = 'block';
-});
-
-// Close settings panel when clicking the close button or outside the panel
-document.getElementById('close-settings').addEventListener('click', () => {
-document.getElementById('settings-panel').style.display = 'none';
-});
-window.addEventListener('click', function(event) {
-const settingsPanel = document.getElementById('settings-panel');
-if (event.target === settingsPanel) {
-  settingsPanel.style.display = 'none';
-}
-});
-
-// Temperature conversion functions
-function toCelsius(fahrenheit) {
-return ((fahrenheit - 32) * 5 / 9).toFixed(1);
-}
-
-// Update all displayed temperatures based on user preference using stored original values
-function updateTemperatures(useCelsius) {
-const temperatureEl = document.getElementById('temperature');
-const tempRangeEl = document.getElementById('temp-range');
-const forecastTemps = document.querySelectorAll('.forecast-day span:last-child');
-
-// Update current temperature using originalFahrenheit data if available
-if (originalFahrenheit.currentTemp !== null) {
-  const displayTemp = useCelsius 
-    ? toCelsius(originalFahrenheit.currentTemp)
-    : Math.round(originalFahrenheit.currentTemp);
-  temperatureEl.textContent = `${displayTemp}°${useCelsius ? 'C' : 'F'}`;
-}
-
-// Update temperature range
-if (originalFahrenheit.tempMax !== null && originalFahrenheit.tempMin !== null) {
-  const max = useCelsius 
-    ? toCelsius(originalFahrenheit.tempMax)
-    : Math.round(originalFahrenheit.tempMax);
-  const min = useCelsius 
-    ? toCelsius(originalFahrenheit.tempMin)
-    : Math.round(originalFahrenheit.tempMin);
-  tempRangeEl.textContent = `${max}°${useCelsius ? 'C' : 'F'} / ${min}°${useCelsius ? 'C' : 'F'}`;
-}
-
-// Update forecast temperatures
-forecastTemps.forEach((tempEl, index) => {
-  if (index < originalFahrenheit.forecastTemps.length) {
-    const highF = originalFahrenheit.forecastTemps[index].high;
-    const lowF = originalFahrenheit.forecastTemps[index].low;
-    
-    const highDisplay = useCelsius ? toCelsius(highF) : Math.round(highF);
-    const lowDisplay = useCelsius ? toCelsius(lowF) : Math.round(lowF);
-    
-    tempEl.textContent = `${highDisplay}°${useCelsius ? 'C' : 'F'} / ${lowDisplay}°${useCelsius ? 'C' : 'F'}`;
-  }
-});
-
-// Update Dewpoint temp
-const dewpoint = useCelsius
-  ? toCelsius(originalFahrenheit.dewpoint)
-  : Math.round(originalFahrenheit.dewpoint);
-document.getElementById('dewpoint-value').textContent = `${dewpoint}°${useCelsius ? 'C' : 'F'}`;
-
-
-}
-
-// Load user preference from localStorage for temperature unit
-const unitToggle = document.getElementById('unit-toggle');
-unitToggle.addEventListener('change', function() {
-const useCelsius = unitToggle.checked;
-localStorage.setItem('useCelsius', useCelsius);
-updateTemperatures(useCelsius);
-});
-const savedUseCelsius = localStorage.getItem('useCelsius') === 'true';
-unitToggle.checked = savedUseCelsius;
-
-// OpenWeather API functionality
-const apiKey = "e7b7ac2a747ddf746dafed7974c1fe59"; // Replace with your OpenWeather API key
-const latInput = document.getElementById('lat-input');
-const lonInput = document.getElementById('lon-input');
-const getWeatherBtn = document.getElementById('get-weather-btn');
-const useLocationBtn = document.getElementById('use-location-btn');
-const temperatureEl = document.getElementById('temperature');
-const tempRangeEl = document.getElementById('temp-range');
-const weatherIconEl = document.getElementById('weather-icon');
-const currentWeatherTextEl = document.getElementById('current-weather-text');
-const pressureEl = document.getElementById('pressure-value');
-const windEl = document.getElementById('wind-value');
-const cloudCoverEl = document.getElementById('cloud-cover-value');
-const dewpointEl = document.getElementById('dewpoint-value');
-
-// Mapping weather condition codes to icon file names
-function getWeatherIcon(weatherId, isDay) {
-if (weatherId >= 200 && weatherId < 300) {
-    return "Thunderstorm_Icon.png";
-} else if (weatherId === 800 || weatherId === 801) {
-    return isDay ? "Day_Clear_Icon.png" : "Night_Clear_Icon.png";
-} else if (weatherId === 802) {
-    return isDay ? "Day_PartlyCloudy_Icon.png" : "Night_PartlyCloudy_Icon.png";
-} else if (weatherId === 803) {
-    return isDay ? "Day_MostlyCloudy_Icon.png" : "Night_MostlyCloudy_Icon.png";
-} else if (weatherId === 804) {
-    return "Overcast_Icon.png";
-} else if (weatherId >= 300 && weatherId < 500) {
-    return isDay ? "Day_LightRain_Icon.png" : "Night_LightRain_Icon.png";
-} else if (weatherId >= 500 && weatherId < 600) {
-    if (weatherId === 511) {
-        return "Hail_Icon.png";
-    }
-    if (weatherId === 500 || weatherId === 520) {
-        return isDay ? "Day_LightRain_Icon.png" : "Night_LightRain_Icon.png";
-    }
-    return "Rain_Icon.png";
-} else if (weatherId >= 600 && weatherId < 700) {
-    if (weatherId === 602) {
-        return "HeavySnow_Icon.png";
-    }
-    return isDay ? "Day_LightSnow_Icon.png" : "Night_LightSnow_Icon.png";
-} else if (weatherId >= 700 && weatherId < 800) {
-    return "Fog_Icon.png";
-} else {
-    return "Overcast_Icon.png";
-}
-}
-
-// Fetch weather data using One Call API 3.0
-function fetchWeather(lat, lon) {
-// Using One Call API 3.0
-const oneCallUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=minutely,hourly&appid=${apiKey}`;
-
-fetch(oneCallUrl)
-  .then(response => {
-    if (!response.ok) {
-      throw new Error("Network response was not ok for One Call API");
-    }
-    return response.json();
-  })
-  .then(data => {
-    // Handle current weather data
-    const current = data.current;
-    
-    // Store original Fahrenheit values
-    originalFahrenheit.currentTemp = current.temp;
-    originalFahrenheit.tempMax = data.daily[0].temp.max;
-    originalFahrenheit.tempMin = data.daily[0].temp.min;
-    originalFahrenheit.dewpoint = current.dew_point;
-    
-    // Update current weather display
-    const currentTemp = Math.round(current.temp);
-    temperatureEl.textContent = `${currentTemp}°F`;
-    tempRangeEl.textContent = `${Math.round(data.daily[0].temp.max)}°F / ${Math.round(data.daily[0].temp.min)}°F`;
-    
-    // Determine if it's day or night
-    const currentTime = current.dt;
-    const isDay = currentTime >= data.current.sunrise && currentTime < data.current.sunset;
-    
-    // Update weather icon and description
-    const weatherId = current.weather[0].id;
-    const iconSrc = getWeatherIcon(weatherId, isDay);
-    weatherIconEl.src = iconSrc;
-    weatherIconEl.alt = current.weather[0].description;
-    currentWeatherTextEl.textContent = "Current Weather: " +
-      current.weather[0].description.split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-    
-    // Update extra info
-    pressureEl.textContent = `${current.pressure} hPa`;
-    
-    // Handle wind direction
-    const windDeg = current.wind_deg;
-    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    const windIndex = Math.round(windDeg / 45) % 8;
-    const windDir = directions[windIndex];
-    windEl.textContent = `${current.wind_speed} mph ${windDir}`;
-    
-    // Update cloud cover and dewpoint
-    cloudCoverEl.textContent = `${current.clouds}%`;
-    dewpointEl.textContent = `${Math.round(current.dew_point)}°F`;
-    
-    // Handle forecast data (daily)
-    const dailyForecasts = [];
-    originalFahrenheit.forecastTemps = [];
-    
-    // Format date to MM/DD
-    function formatDate(timestamp) {
-      const date = new Date(timestamp * 1000);
-      return `${date.getMonth() + 1}/${date.getDate()}`;
-    }
-    
-    // Process daily forecasts (up to 5 days)
-    const forecastDays = Math.min(data.daily.length - 1, 5); // Skip today's forecast
-    
-    for (let i = 1; i <= forecastDays; i++) {
-      const forecast = data.daily[i];
-      const dateStr = formatDate(forecast.dt);
-      
-      // Store raw Fahrenheit values for later unit conversion
-      originalFahrenheit.forecastTemps.push({
-        high: forecast.temp.max,
-        low: forecast.temp.min
+      // Enhanced 3D hover effect for panels
+      panels.forEach(panel => {
+        panel.addEventListener('mousemove', (e) => {
+          const rect = panel.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const xPercent = x / rect.width - 0.5;
+          const yPercent = y / rect.height - 0.5;
+          panel.style.transform = `perspective(1000px) translateZ(30px) rotateX(${yPercent * -8}deg) rotateY(${xPercent * 8}deg)`;
+        });
+        panel.addEventListener('mouseleave', () => {
+          panel.style.transform = 'perspective(1000px) translateZ(15px)';
+        });
       });
-      
-      dailyForecasts.push({
-        dateStr: dateStr,
-        highTemp: Math.round(forecast.temp.max),
-        lowTemp: Math.round(forecast.temp.min),
-        weatherId: forecast.weather[0].id
-      });
-    }
-    
-    // Update the UI with forecast data
-    const forecastDayElements = document.querySelectorAll('.forecast-day');
-    dailyForecasts.forEach((forecast, index) => {
-      if (index < forecastDayElements.length) {
-        const dayEl = forecastDayElements[index];
-        dayEl.querySelector('span:first-child').textContent = forecast.dateStr;
-        dayEl.querySelector('img').src = getWeatherIcon(forecast.weatherId, true);
-        dayEl.querySelector('span:last-child').textContent = `${forecast.highTemp}°F / ${forecast.lowTemp}°F`;
+
+      // Floating animation for panels
+      function animatePanels() {
+        panels.forEach((panel, index) => {
+          const delay = index * 0.2;
+          const duration = 3 + Math.random() * 2;
+          panel.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
+        });
       }
+      animatePanels();
+
+      // --- UTILITY FUNCTIONS ---
+      const toCelsius = (f) => ((f - 32) * 5 / 9).toFixed(1);
+      const capitalize = (s) => s.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+      function showStatus(message, type = 'loading') {
+        statusMessageEl.textContent = message;
+        statusMessageEl.className = `status-message ${type}`;
+        statusMessageEl.style.display = 'block';
+      }
+
+      function hideStatus() {
+        statusMessageEl.style.display = 'none';
+      }
+
+      function formatTime(timestamp, timezoneOffset) {
+        const date = new Date((timestamp + timezoneOffset) * 1000);
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+      }
+
+      function formatDate(timestamp) {
+        const date = new Date(timestamp * 1000);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      }
+
+      function getWeatherIcon(weatherId, isDay) {
+        if (weatherId >= 200 && weatherId < 300) return "Thunderstorm_Icon.png";
+        if (weatherId === 800) return isDay ? "Day_Clear_Icon.png" : "Night_Clear_Icon.png";
+        if (weatherId === 801) return isDay ? "Day_Clear_Icon.png" : "Night_Clear_Icon.png";
+        if (weatherId === 802) return isDay ? "Day_PartlyCloudy_Icon.png" : "Night_PartlyCloudy_Icon.png";
+        if (weatherId === 803) return isDay ? "Day_MostlyCloudy_Icon.png" : "Night_MostlyCloudy_Icon.png";
+        if (weatherId === 804) return "Overcast_Icon.png";
+        if (weatherId >= 300 && weatherId < 500) return isDay ? "Day_LightRain_Icon.png" : "Night_LightRain_Icon.png";
+        if (weatherId >= 500 && weatherId < 600) {
+            if (weatherId === 511) return "Hail_Icon.png";
+            if (weatherId === 500 || weatherId === 520) return isDay ? "Day_LightRain_Icon.png" : "Night_LightRain_Icon.png";
+            return "Rain_Icon.png";
+        }
+        if (weatherId >= 600 && weatherId < 700) {
+            if (weatherId === 602) return "HeavySnow_Icon.png";
+            return isDay ? "Day_LightSnow_Icon.png" : "Night_LightSnow_Icon.png";
+        }
+        if (weatherId >= 700 && weatherId < 800) return "Fog_Icon.png";
+        return "Overcast_Icon.png";
+      }
+
+      // --- UI UPDATE FUNCTIONS ---
+      function updateTemperaturesUI(useCelsius) {
+        if (originalData.currentTemp === null) return;
+
+        const tempUnit = useCelsius ? 'C' : 'F';
+        const formatTemp = (f) => useCelsius ? toCelsius(f) : Math.round(f);
+
+        document.getElementById('temperature').textContent = `${formatTemp(originalData.currentTemp)}°${tempUnit}`;
+        document.getElementById('temp-range').textContent = `${formatTemp(originalData.tempMax)}° / ${formatTemp(originalData.tempMin)}°${tempUnit}`;
+        document.getElementById('dewpoint-value').textContent = `${formatTemp(originalData.dewpoint)}°${tempUnit}`;
+
+        const forecastDayElements = document.querySelectorAll('.forecast-day');
+        originalData.forecasts.forEach((forecast, index) => {
+          if (index < forecastDayElements.length) {
+            const dayEl = forecastDayElements[index];
+            const high = formatTemp(forecast.high);
+            const low = formatTemp(forecast.low);
+            dayEl.querySelector('span:last-child').textContent = `${high}° / ${low}°${tempUnit}`;
+          }
+        });
+      }
+
+      function updateWeatherUI(data) {
+        // Store original data for temperature conversion
+        originalData = {
+          currentTemp: data.current.temp,
+          tempMax: data.daily[0].temp.max,
+          tempMin: data.daily[0].temp.min,
+          dewpoint: data.current.dew_point,
+          forecasts: data.daily.slice(1, 6).map(f => ({ high: f.temp.max, low: f.temp.min }))
+        };
+
+        // Current Weather
+        const current = data.current;
+        const isDay = current.dt >= current.sunrise && current.dt < current.sunset;
+        document.getElementById('weather-icon').src = getWeatherIcon(current.weather[0].id, isDay);
+        document.getElementById('weather-icon').alt = capitalize(current.weather[0].description);
+        document.getElementById('current-weather-text').textContent = `Current: ${capitalize(current.weather[0].description)}`;
+
+        // Extra Info
+        document.getElementById('pressure-value').textContent = `${current.pressure} hPa`;
+        const windDeg = current.wind_deg;
+        const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        const windDir = directions[Math.round(windDeg / 45) % 8];
+        document.getElementById('wind-value').textContent = `${current.wind_speed.toFixed(1)} mph ${windDir}`;
+        document.getElementById('cloud-cover-value').textContent = `${current.clouds}%`;
+        document.getElementById('sunrise-value').textContent = formatTime(current.sunrise, data.timezone_offset);
+        document.getElementById('sunset-value').textContent = formatTime(current.sunset, data.timezone_offset);
+
+        // Forecast
+        const forecastDayElements = document.querySelectorAll('.forecast-day');
+        data.daily.slice(1, 6).forEach((forecast, index) => {
+          if (index < forecastDayElements.length) {
+            const dayEl = forecastDayElements[index];
+            dayEl.querySelector('span:first-child').textContent = formatDate(forecast.dt);
+            dayEl.querySelector('img').src = getWeatherIcon(forecast.weather[0].id, true);
+            dayEl.querySelector('.desc').textContent = capitalize(forecast.weather[0].description);
+          }
+        });
+
+        // Update all temperatures based on saved preference
+        updateTemperaturesUI(unitToggle.checked);
+        hideStatus();
+      }
+
+      // --- API CALLS ---
+      async function fetchWeather(lat, lon) {
+        showStatus('Summoning weather spirits...');
+        const oneCallUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=minutely,hourly&appid=${apiKey}`;
+        try {
+          const response = await fetch(oneCallUrl);
+          if (!response.ok) throw new Error(`Weather data not found. (HTTP ${response.status})`);
+          const data = await response.json();
+          updateWeatherUI(data);
+        } catch (error) {
+          console.error("Error fetching weather data:", error);
+          showStatus(`Error: ${error.message}`, 'error');
+        }
+      }
+
+      async function getCoordsForCity(city) {
+        showStatus(`Finding ${city}...`);
+        const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${apiKey}`;
+        try {
+          const response = await fetch(geocodeUrl);
+          if (!response.ok) throw new Error('Could not connect to location service.');
+          const data = await response.json();
+          if (data.length === 0) throw new Error(`City "${city}" not found.`);
+          const { lat, lon, name, country } = data[0];
+          cityInput.value = `${name}, ${country}`;
+          await fetchWeather(lat, lon);
+        } catch (error) {
+          console.error("Error geocoding city:", error);
+          showStatus(`Error: ${error.message}`, 'error');
+        }
+      }
+
+      function getWeatherForCurrentLocation() {
+        if (navigator.geolocation) {
+          showStatus('Getting your location...');
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              cityInput.value = `Current Location (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`;
+              fetchWeather(latitude, longitude);
+            },
+            (error) => {
+              console.warn("Geolocation error:", error.message);
+              showStatus('Could not get your location. Please enter a city.', 'error');
+            }
+          );
+        } else {
+          showStatus('Geolocation is not supported by your browser.', 'error');
+        }
+      }
+
+      // --- EVENT LISTENERS ---
+      getWeatherBtn.addEventListener('click', () => {
+        const city = cityInput.value.trim();
+        if (city) {
+          getCoordsForCity(city);
+        } else {
+          showStatus('Please enter a city name.', 'error');
+        }
+      });
+
+      cityInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+          getWeatherBtn.click();
+        }
+      });
+
+      useLocationBtn.addEventListener('click', getWeatherForCurrentLocation);
+
+      document.getElementById('home-btn').addEventListener('click', () => location.reload());
+
+      settingsBtn.addEventListener('click', () => settingsPanel.classList.add('visible'));
+      closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.remove('visible'));
+      window.addEventListener('click', (event) => {
+        if (event.target === settingsPanel) {
+          settingsPanel.classList.remove('visible');
+        }
+      });
+
+      unitToggle.addEventListener('change', function() {
+        const useCelsius = this.checked;
+        localStorage.setItem('useCelsius', useCelsius);
+        updateTemperaturesUI(useCelsius);
+      });
+
+      // --- INITIALIZATION ---
+      getWeatherForCurrentLocation();
     });
-    
-    // Apply temperature unit preference
-    updateTemperatures(savedUseCelsius);
-  })
-  .catch(error => {
-    console.error("Error fetching weather data:", error);
-    alert("Error fetching weather data. Please check your API key and connection.");
-  });
-}
-
-// Event listener for "Get Weather!" button
-getWeatherBtn.addEventListener('click', () => {
-const lat = parseFloat(latInput.value);
-const lon = parseFloat(lonInput.value);
-if (!isNaN(lat) && !isNaN(lon)) {
-  fetchWeather(lat, lon);
-} else {
-  alert("Please enter valid latitude and longitude values.");
-}
-});
-
-// Event listener for "Use my Location" button
-useLocationBtn.addEventListener('click', () => {
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition((position) => {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-    latInput.value = lat.toFixed(4);
-    lonInput.value = lon.toFixed(4);
-    fetchWeather(lat, lon);
-  }, (error) => {
-    alert("Error retrieving your location: " + error.message);
-  });
-} else {
-  alert("Geolocation is not supported by your browser.");
-}
-});
-</script>
+  </script>
 </body>
 </html>
